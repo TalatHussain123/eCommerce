@@ -9,6 +9,11 @@ const imageUpload = multer({ storage });
 const resource = '/user'
 export const defineRoutes = (app, baseurl) => {
     app.post(
+        `${baseurl}${resource}/verify-otp`,
+        errorMiddleware,
+        userController.verifyOTP
+    );
+    app.post(
         `${baseurl}${resource}/register`,
         // userValMiddleware.validateSignupParams,
         errorMiddleware,
@@ -32,6 +37,12 @@ export const defineRoutes = (app, baseurl) => {
         userValMiddleware.validateForgetPasswordParams,
         errorMiddleware,
         userController.forgetPassword
+    );
+    app.post(
+        `${baseurl}${resource}/forgetPassword-verify`,
+        userValMiddleware.validateForgetPasswordParams,
+        errorMiddleware,
+        userController.verifyOTPAndResetPassword
     );
     app.get(
         `${baseurl}${resource}/stats`,
