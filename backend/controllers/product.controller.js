@@ -101,7 +101,7 @@ async function getProductCountsPerCategory() {
 
 //get all products and also get with home category gender and search history
 export const getAllProduct = async (req, res) => {
-    const { home, category, gender, search } = req.query;
+    const { home, category, gender, search, showcategory } = req.query;
     const userId = req.user._id;
     try {
         let products;
@@ -113,7 +113,20 @@ export const getAllProduct = async (req, res) => {
             categoryCounts = await getProductCountsPerCategory();
         } else if (category) {
             products = await Product.find({ categories: { $in: [category] } });
-        } else if (gender) {
+        } else if (showcategory === 'category') {
+            products = await Product.find();
+            const categorizedProducts = products.reduce((acc, product) => {
+                product.categories.forEach(cat => {
+                    if (!acc[cat]) {
+                        acc[cat] = [];
+                    }
+                    acc[cat].push(product);
+                });
+                return acc;
+            }, {});
+            return res.status(200).json({ categorizedProducts });
+        }
+        else if (gender) {
             products = await Product.find({ gender });
         } else if (search) {
             products = await Product.find({
